@@ -112,7 +112,7 @@ typedef struct
 	Uint8 rtr;		/**< remote transmission request. (0 if not rtr message, 1 if rtr message) */
 	Uint8 len;		/**< message's length (0 to 8) */
 	Uint8 data[8]; /**< message's datas */
-} Message;
+} MessageExt;
 #endif
 
 

@@ -1063,7 +1063,7 @@ interrupt void ECAN0INTA_ISR(void)  // eCAN-A
     			mbdtmp = ECanaRegs.CANMD.all;
     			if ((((regtmpnd >> mbnum) & 0x01) != 0) && (((mbdtmp >> mbnum) & 0x01) == 1))
     			{
-    				pmbox += mbnum;
+    				/*pmbox += mbnum;
     				Rec_l = pmbox->MDL.all;
     				Rec_h = pmbox->MDH.all;
 
@@ -1090,9 +1090,10 @@ interrupt void ECAN0INTA_ISR(void)  // eCAN-A
     				canrxmsg.rtr = pmbox->MSGCTRL.bit.RTR;
 
     				regtmpnd |= ((Uint32)1 << mbnum);
-    				ECanaRegs.CANRMP.all = regtmpnd;
+    				ECanaRegs.CANRMP.all = regtmpnd;*/
 
-    				flag = 1;
+    				msg_received++;
+    				//flag = 1;
     			}
     		}
     	}

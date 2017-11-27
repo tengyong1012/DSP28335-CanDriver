@@ -22,8 +22,23 @@ $(GEN_CMDS__FLAG) \
 "./DSP2833x_SysCtrl.obj" \
 "./DSP2833x_usDelay.obj" \
 "./DSP28_ECan.obj" \
-"../28335_RAM_lnk.cmd" \
+"./main.obj" \
+"./canfestival/src/28335timerdriver.obj" \
+"./canfestival/src/ObjDict.obj" \
+"./canfestival/src/dcf.obj" \
+"./canfestival/src/emcy.obj" \
+"./canfestival/src/lifegrd.obj" \
+"./canfestival/src/lss.obj" \
+"./canfestival/src/nmtMaster.obj" \
+"./canfestival/src/nmtSlave.obj" \
+"./canfestival/src/objacces.obj" \
+"./canfestival/src/pdo.obj" \
+"./canfestival/src/sdo.obj" \
+"./canfestival/src/states.obj" \
+"./canfestival/src/sync.obj" \
+"./canfestival/src/timer.obj" \
 "../DSP2833x_Headers_nonBIOS.cmd" \
+"../F28335.cmd" \
 -l"libc.a" \
 
 -include ../makefile.init
@@ -34,7 +49,9 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
+-include canfestival/src/subdir_vars.mk
 -include subdir_rules.mk
+-include canfestival/src/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -154,8 +171,8 @@ all: 28335_Can_TxRx.out
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "CAN_TEST.pp" "DSP2833x_CpuTimers.pp" "DSP2833x_DefaultIsr.pp" "DSP2833x_EPwm.pp" "DSP2833x_GlobalVariableDefs.pp" "DSP2833x_MemCopy.pp" "DSP2833x_PieCtrl.pp" "DSP2833x_PieVect.pp" "DSP2833x_SysCtrl.pp" "DSP28_ECan.pp" 
-	-$(RM) "CAN_TEST.obj" "DSP2833x_ADC_cal.obj" "DSP2833x_CSMPasswords.obj" "DSP2833x_CodeStartBranch.obj" "DSP2833x_CpuTimers.obj" "DSP2833x_DefaultIsr.obj" "DSP2833x_EPwm.obj" "DSP2833x_GlobalVariableDefs.obj" "DSP2833x_MemCopy.obj" "DSP2833x_PieCtrl.obj" "DSP2833x_PieVect.obj" "DSP2833x_SysCtrl.obj" "DSP2833x_usDelay.obj" "DSP28_ECan.obj" 
+	-$(RM) "CAN_TEST.pp" "DSP2833x_CpuTimers.pp" "DSP2833x_DefaultIsr.pp" "DSP2833x_EPwm.pp" "DSP2833x_GlobalVariableDefs.pp" "DSP2833x_MemCopy.pp" "DSP2833x_PieCtrl.pp" "DSP2833x_PieVect.pp" "DSP2833x_SysCtrl.pp" "DSP28_ECan.pp" "main.pp" "canfestival\src\28335timerdriver.pp" "canfestival\src\ObjDict.pp" "canfestival\src\dcf.pp" "canfestival\src\emcy.pp" "canfestival\src\lifegrd.pp" "canfestival\src\lss.pp" "canfestival\src\nmtMaster.pp" "canfestival\src\nmtSlave.pp" "canfestival\src\objacces.pp" "canfestival\src\pdo.pp" "canfestival\src\sdo.pp" "canfestival\src\states.pp" "canfestival\src\sync.pp" "canfestival\src\timer.pp" 
+	-$(RM) "CAN_TEST.obj" "DSP2833x_ADC_cal.obj" "DSP2833x_CSMPasswords.obj" "DSP2833x_CodeStartBranch.obj" "DSP2833x_CpuTimers.obj" "DSP2833x_DefaultIsr.obj" "DSP2833x_EPwm.obj" "DSP2833x_GlobalVariableDefs.obj" "DSP2833x_MemCopy.obj" "DSP2833x_PieCtrl.obj" "DSP2833x_PieVect.obj" "DSP2833x_SysCtrl.obj" "DSP2833x_usDelay.obj" "DSP28_ECan.obj" "main.obj" "canfestival\src\28335timerdriver.obj" "canfestival\src\ObjDict.obj" "canfestival\src\dcf.obj" "canfestival\src\emcy.obj" "canfestival\src\lifegrd.obj" "canfestival\src\lss.obj" "canfestival\src\nmtMaster.obj" "canfestival\src\nmtSlave.obj" "canfestival\src\objacces.obj" "canfestival\src\pdo.obj" "canfestival\src\sdo.obj" "canfestival\src\states.obj" "canfestival\src\sync.obj" "canfestival\src\timer.obj" 
 	-$(RM) "DSP2833x_ADC_cal.pp" "DSP2833x_CSMPasswords.pp" "DSP2833x_CodeStartBranch.pp" "DSP2833x_usDelay.pp" 
 	-@echo 'Finished clean'
 	-@echo ' '

@@ -193,8 +193,9 @@ extern Uint16 XintffuncsLoadStart;
 extern Uint16 XintffuncsLoadEnd;
 extern Uint16 XintffuncsRunStart;
 extern CanState canastate;
-extern Message cantxmsg;
-extern Message canrxmsg;
+extern MessageExt cantxmsg;
+extern MessageExt canrxmsg;
+extern Uint8 msg_received;
 extern Uint8 flag;
 #ifdef __cplusplus
 }

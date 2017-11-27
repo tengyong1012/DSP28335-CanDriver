@@ -5,7 +5,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROGRAM.Texas Instruments XDS100v3 USB Emulator_0/C28xx" value="${build_artifact:28335_Can_TxRx}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.Texas Instruments XDS100v3 USB Emulator_0/C28xx" value="28335_Can_TxRx"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:28335_Can_TxRx}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS100v3 USB Emulator_0/C28xx" value="D:/C28335\Proj\workspace\workspace\SXD28335B_SYEXT_Pro_II\Example_2833x_Can_Rx\Debug\28335_Can_TxRx.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Texas Instruments XDS100v3 USB Emulator_0/C28xx" value="D:/C28335\Proj\28335CanDriver\DSP28335-CanDriver\Debug\28335_Can_TxRx.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/28335_Can_TxRx"/>
 </listAttribute>

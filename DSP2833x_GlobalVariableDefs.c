@@ -427,9 +427,10 @@ volatile struct XINTRUPT_REGS XIntruptRegs;
 volatile struct XINTF_REGS XintfRegs;
 
 CanState canastate;
-Message cantxmsg;
-Message canrxmsg;
+MessageExt cantxmsg;
+MessageExt canrxmsg;
 Uint8 flag;
+Uint8 msg_received = 0;
 //===========================================================================
 // End of file.
 //===========================================================================

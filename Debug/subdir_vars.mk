@@ -4,8 +4,8 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CMD_SRCS += \
-../28335_RAM_lnk.cmd \
-../DSP2833x_Headers_nonBIOS.cmd 
+../DSP2833x_Headers_nonBIOS.cmd \
+../F28335.cmd 
 
 ASM_SRCS += \
 ../DSP2833x_ADC_cal.asm \
@@ -23,7 +23,8 @@ C_SRCS += \
 ../DSP2833x_PieCtrl.c \
 ../DSP2833x_PieVect.c \
 ../DSP2833x_SysCtrl.c \
-../DSP28_ECan.c 
+../DSP28_ECan.c \
+../main.c 
 
 OBJS += \
 ./CAN_TEST.obj \
@@ -39,7 +40,8 @@ OBJS += \
 ./DSP2833x_PieVect.obj \
 ./DSP2833x_SysCtrl.obj \
 ./DSP2833x_usDelay.obj \
-./DSP28_ECan.obj 
+./DSP28_ECan.obj \
+./main.obj 
 
 ASM_DEPS += \
 ./DSP2833x_ADC_cal.pp \
@@ -57,7 +59,8 @@ C_DEPS += \
 ./DSP2833x_PieCtrl.pp \
 ./DSP2833x_PieVect.pp \
 ./DSP2833x_SysCtrl.pp \
-./DSP28_ECan.pp 
+./DSP28_ECan.pp \
+./main.pp 
 
 C_DEPS__QUOTED += \
 "CAN_TEST.pp" \
@@ -69,7 +72,8 @@ C_DEPS__QUOTED += \
 "DSP2833x_PieCtrl.pp" \
 "DSP2833x_PieVect.pp" \
 "DSP2833x_SysCtrl.pp" \
-"DSP28_ECan.pp" 
+"DSP28_ECan.pp" \
+"main.pp" 
 
 OBJS__QUOTED += \
 "CAN_TEST.obj" \
@@ -85,7 +89,8 @@ OBJS__QUOTED += \
 "DSP2833x_PieVect.obj" \
 "DSP2833x_SysCtrl.obj" \
 "DSP2833x_usDelay.obj" \
-"DSP28_ECan.obj" 
+"DSP28_ECan.obj" \
+"main.obj" 
 
 ASM_DEPS__QUOTED += \
 "DSP2833x_ADC_cal.pp" \
@@ -103,7 +108,8 @@ C_SRCS__QUOTED += \
 "../DSP2833x_PieCtrl.c" \
 "../DSP2833x_PieVect.c" \
 "../DSP2833x_SysCtrl.c" \
-"../DSP28_ECan.c" 
+"../DSP28_ECan.c" \
+"../main.c" 
 
 ASM_SRCS__QUOTED += \
 "../DSP2833x_ADC_cal.asm" \

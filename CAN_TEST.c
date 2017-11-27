@@ -5,27 +5,112 @@
 **	实验说明:将MBOX16设置为接收模式，并采用中断的方式接收数据       **
 **	实验结果:可以观察变量Rec_h，Rec_l,看看收到的数据                **
 ****************************************************************/
+#include "CAN_TEST.h"
 
-#include "DSP2833x_Device.h"     // DSP2833x Headerfile Include File
-#include "DSP2833x_Examples.h"   // DSP2833x Examples Include File
-
-#define MAXCOUNTER (0x70000000)
+//Uint8 msg_received = 0;
 
 
+Uint8 canReceive(Message *m)
+{
+	Uint32 mbdtmp = 0, regtmpnd = 0, Rec_l = 0, Rec_h = 0;
+	//Uint8  i = 0, j =0, k = 0;
+	Uint16 mbnum = 0;
 
-Uint64 numb;
-Uint32 datatmpl;
-Uint32 datatmph;
+    volatile struct ECAN_MBOXES *pECanaMboxes;
+    volatile struct MBOX *pmbox;
 
-Uint32 CanId;
+    pECanaMboxes = &ECanaMboxes;
+    pmbox = &pECanaMboxes->MBOX0;
 
+	if (msg_received == 0)
+	{
+		return 0;
+	}
+
+	regtmpnd = ECanaRegs.CANRMP.all;
+	mbdtmp = ECanaRegs.CANMD.all;
+
+	while (regtmpnd != 0)
+	{
+		if ((((regtmpnd >> mbnum) & 0x01) != 0) && (((mbdtmp >> mbnum) & 0x01) == 1))
+		{
+			break;
+		}
+
+		mbnum++;
+		if (mbnum >= 16)
+		{
+			msg_received = 0;
+			break;
+		}
+	}
+
+	if (mbnum < 16)
+	{
+		pmbox += mbnum;
+		Rec_l = pmbox->MDL.all;
+		Rec_h = pmbox->MDH.all;
+
+		canrxmsg.data[0] = Rec_l & (Uint8)0xFF;
+		canrxmsg.data[1] = (Rec_l >> 8) & (Uint8)0xFF;
+		canrxmsg.data[2] = (Rec_l >> 16) & (Uint8)0xFF;
+		canrxmsg.data[3] = (Rec_l >> 24) & (Uint8)0xFF;
+		canrxmsg.data[4] = Rec_h & (Uint8)0xFF;
+		canrxmsg.data[5] = (Rec_h >> 8) & (Uint8)0xFF;
+		canrxmsg.data[6] = (Rec_h >> 16) & (Uint8)0xFF;
+		canrxmsg.data[7] = (Rec_h >> 24) & (Uint8)0xFF;
+
+		if ((pmbox->MSGID.all & (Uint32)0x80000000) != 0)
+		{
+			canrxmsg.cob_id = pmbox->MSGID.all & ~((Uint32)0xE0000000);
+			canrxmsg.extendflag = 1;
+		}
+		else
+		{
+			canrxmsg.cob_id = (pmbox->MSGID.all >> 18) & (Uint32)0x3FF;
+			canrxmsg.extendflag = 0;
+		}
+		canrxmsg.len = pmbox->MSGCTRL.bit.DLC;
+		canrxmsg.rtr = pmbox->MSGCTRL.bit.RTR;
+		//copy data to m and give up extend frame
+		if (canrxmsg.extendflag == 0)
+		{
+			m->cob_id = canrxmsg.cob_id;
+			m->rtr = canrxmsg.rtr;
+			m->len = canrxmsg.len;
+			memcpy(m->data, canrxmsg.data, canrxmsg.len);
+		}
+
+		regtmpnd |= ((Uint32)1 << mbnum);
+		ECanaRegs.CANRMP.all = regtmpnd;
+
+		msg_received--;
+		return 1;
+	}
+	else
+		return 0;
+}
+
+Uint8 canSend(CAN_PORT notused, Message *m)
+{
+	MessageExt temp;
+	temp.cob_id = m->cob_id;
+	temp.rtr = m->rtr;
+	temp.len = m->len;
+	memcpy(temp.data, m->data, m->len);
+	temp.extendflag = 0;
+
+	if (CanTxMsg(temp))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
 
 //extern CanState canastate;
-
-extern void InitECan(void);
-
-
-
 int CanFindIdleTxMb()
 {
     Uint8 index = 0;
@@ -60,7 +145,7 @@ int CanFindIdleTxMb()
 }
 
 
-void CanConfigTxMb(Message *pmsg, int mbnum)
+void CanConfigTxMb(MessageExt *pmsg, int mbnum)
 {
     Uint32 datal = 0, datah = 0;
     struct ECAN_REGS ECanaShadow;
@@ -113,7 +198,7 @@ void CanConfigTxMb(Message *pmsg, int mbnum)
 	ECanaRegs.CANTOC.all = ECanaShadow.CANTOC.all;
 }
 
-int CanTxMsg(Message data)
+int CanTxMsg(MessageExt data)
 {
     int result = 0;
     //find free mailbox for tx;
@@ -131,132 +216,7 @@ int CanTxMsg(Message data)
     }
 }
 
-void CanTest2()
-{
-	if (flag == 1)
-	{
-		CanTxMsg(canrxmsg);
-		flag = 0;
-	}
-}
-void CanTxTest(void)
-{
-	Uint32 datatmpl = 0, datatmph = 0;
-	Message msg;
 
-	datatmph = numb >> 32;
-	datatmpl = numb & 0xFFFFFFFF;
-    //extend frame
-	msg.cob_id = (Uint32)0x80000000 | CanId;
-	msg.rtr = 0;
-	msg.len = 8;
-	msg.data[0] = datatmpl & 0xFF;
-	msg.data[1] = (datatmpl >> 8) & 0xFF;
-	msg.data[2] = (datatmpl >> 16) & 0xFF;
-	msg.data[3] = (datatmpl >> 24) & 0xFF;
-	msg.data[4] = datatmph & 0xFF;
-	msg.data[5] = (datatmph >> 8) & 0xFF;
-	msg.data[6] = (datatmph >> 16) & 0xFF;
-	msg.data[7] = (datatmph >> 24) & 0xFF;
-    //senddata
-	if (CanTxMsg(msg) > 0)
-	{
-		numb++;
-		CanId++;
-		if (CanId > (Uint32)0x1FFFFFFF)
-		{
-			CanId = 0;
-		}
-	}
-
-	if (canastate == BUSOFF)
-	{
-		InitECan();
-		canastate = WORKED;
-	}
-}
-
-interrupt void cpu_timer0_isr(void)
-{
-   CpuTimer0.InterruptCount++;
-   if (CpuTimer0.InterruptCount > MAXCOUNTER)
-   {
-	   CpuTimer0.InterruptCount = 0;
-   }
-   PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
-}
-
-void main(void)
-{
-
-	numb = 1;
-	CanId = 1;
-	datatmpl = 0;
-	datatmph = 1;
-	canastate = IDEL;
-	/*初始化系统*/
-	InitSysCtrl();
-
-	/*关中断*/
-	DINT;
-	IER = 0x0000;
-	IFR = 0x0000;
-
-	/*初始化PIE中断*/
-	InitPieCtrl();
-
-	/*初始化PIE中断矢量表*/
-	InitPieVectTable();
-	/*time1 for interrupt*/
-	EALLOW;
-	PieVectTable.TINT0 = &cpu_timer0_isr;
-	EDIS;
-	InitCpuTimers();
-    ConfigCpuTimer(&CpuTimer0, 150, 1000);
-	CpuTimer0Regs.TCR.all = 0x4001;
-	/*初始化SCIA寄存器*/
-    InitECan();
-    canastate = INITED;
-    flag = 0;
-    //使能PIE中断   
-    PieCtrlRegs.PIEIER9.bit.INTx5 = 1;
-    PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
-	//使能CPU中断
-	IER |= M_INT9;
-	IER |= M_INT1;
-	//PieCtrlRegs.PIEIER1.bit.INTx7 = 1;
-	
-	EINT;   //开全局中断
-	ERTM;	//开实时中断
-	canastate = WORKED;
-    for(;;)
-	{
-		//ECanaRegs.CANTRS.all = 0x00000001;
-		//while(ECanaRegs.CANTA.all == 0)
-		//{
-
-		//}
-		//ECanaMboxes.MBOX0.MDL.all = datatmpl;
-		//ECanaMboxes.MBOX0.MDH.all = datatmph;
-		//ECanaRegs.CANTRS.all = 0x00000001;
-		//ECanaMboxes.MBOX0.MDL.all = 0x01020304;
-		//ECanaMboxes.MBOX0.MDH.all = 0x05060708;
-		//numb++;
-		//datatmpl += 2;
-		//datatmph += 2;
-    	///////////////////////////////////////////
-    	//CanTxTest();
-    	CanTest2();
-    	///////////////////////////////////////////
-		//ECanaRegs.CANTRS.all = 0x00000001;
-		//while(ECanaRegs.CANTA.all == 0);
-		//ECanaRegs.CANTA.all = 0x00000001;
-		//MessageSendCount++;				//在这里设断点，观察
-		//ECanaMboxes.MBOX0.MDL.all = 0x01234567;
-		//ECanaMboxes.MBOX0.MDH.all = 0x89ABCDEF;
-	}
-
-}
 
 //===========================================================================
 // No more.

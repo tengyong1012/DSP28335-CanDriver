@@ -11,7 +11,7 @@
 Uint64 numb;
 Uint32 datatmpl;
 Uint32 datatmph;
-Uint32 CanId = 5;
+Uint32 CanId = 1;
 
 static Message m = Message_Initializer;		// contain a CAN message
 void CanTest2()

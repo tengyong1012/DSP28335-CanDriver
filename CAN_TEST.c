@@ -29,7 +29,7 @@ Uint8 canReceive(Message *m)
 
 	regtmpnd = ECanaRegs.CANRMP.all;
 	mbdtmp = ECanaRegs.CANMD.all;
-
+	mbnum = 16;
 	while (regtmpnd != 0)
 	{
 		if ((((regtmpnd >> mbnum) & 0x01) != 0) && (((mbdtmp >> mbnum) & 0x01) == 1))
@@ -38,14 +38,14 @@ Uint8 canReceive(Message *m)
 		}
 
 		mbnum++;
-		if (mbnum >= 16)
+		if (mbnum >= 32)
 		{
-			msg_received = 0;
+			//msg_received = 0;
 			break;
 		}
 	}
 
-	if (mbnum < 16)
+	if ((mbnum >= 16) && (mbnum <= 31))
 	{
 		pmbox += mbnum;
 		Rec_l = pmbox->MDL.all;
@@ -67,7 +67,7 @@ Uint8 canReceive(Message *m)
 		}
 		else
 		{
-			canrxmsg.cob_id = (pmbox->MSGID.all >> 18) & (Uint32)0x3FF;
+			canrxmsg.cob_id = (pmbox->MSGID.all >> 18) & (Uint32)0x7FF;
 			canrxmsg.extendflag = 0;
 		}
 		canrxmsg.len = pmbox->MSGCTRL.bit.DLC;
@@ -94,10 +94,16 @@ Uint8 canReceive(Message *m)
 Uint8 canSend(CAN_PORT notused, Message *m)
 {
 	MessageExt temp;
+	int i = 0;
 	temp.cob_id = m->cob_id;
 	temp.rtr = m->rtr;
 	temp.len = m->len;
-	memcpy(temp.data, m->data, m->len);
+
+	//memcpy(temp.data, m->data, m->len);
+	for (i = 0 ; i < 8 ; i++)
+	{
+		temp.data[i] =  m->data[i];
+	}
 	temp.extendflag = 0;
 
 	if (CanTxMsg(temp))
@@ -158,13 +164,26 @@ void CanConfigTxMb(MessageExt *pmsg, int mbnum)
     pmbox = &pECanaMboxes->MBOX0;
     pmotoregs = &ECanaMOTORegs.MOTO0;
 
-    datal = ((Uint32)pmsg->data[3] << 24) | ((Uint32)pmsg->data[2] << 16) |
-    		   ((Uint32)pmsg->data[1] << 8) | (pmsg->data[0]);
 
-    datah = ((Uint32)pmsg->data[7] << 24) | ((Uint32)pmsg->data[6] << 16) |
-    		 ((Uint32)pmsg->data[5] << 8) | (pmsg->data[4]);
+
+    /*datal = (((Uint32)pmsg->data[3] & 0xFF) << 24) | (((Uint32)pmsg->data[2] & 0xFF) << 16) |
+    		   (((Uint32)pmsg->data[1] & 0xFF) << 8) | (pmsg->data[0] & 0xFF);
+
+    datah = (((Uint32)pmsg->data[7] & 0xFF) << 24) | (((Uint32)pmsg->data[6] & 0xFF) << 16) |
+    		 (((Uint32)pmsg->data[5] & 0xFF) << 8) | (pmsg->data[4] & 0xFF);*/
 
     pmbox += mbnum;
+
+    pmbox->MDL.byte.BYTE3 = pmsg->data[0];
+    pmbox->MDL.byte.BYTE2 = pmsg->data[1];
+    pmbox->MDL.byte.BYTE1 = pmsg->data[2];
+    pmbox->MDL.byte.BYTE0 = pmsg->data[3];
+
+    pmbox->MDH.byte.BYTE7 = pmsg->data[4];
+    pmbox->MDH.byte.BYTE6 = pmsg->data[5];
+    pmbox->MDH.byte.BYTE5 = pmsg->data[6];
+    pmbox->MDH.byte.BYTE4 = pmsg->data[7];
+
     if (pmsg->extendflag == 1)
     {
     	pmbox->MSGID.all = pmsg->cob_id | (Uint32)0x80000000;
@@ -174,8 +193,8 @@ void CanConfigTxMb(MessageExt *pmsg, int mbnum)
     	pmbox->MSGID.all = (pmsg->cob_id << 18) & (Uint32)0x3FFFFFFF;
     }
 
-    pmbox->MDL.all = datal;
-    pmbox->MDH.all = datah;
+    //pmbox->MDL.all = datal;
+    //pmbox->MDH.all = datah;
     pmbox->MSGCTRL.bit.DLC = pmsg->len;
     pmbox->MSGCTRL.bit.RTR = pmsg->rtr;
 

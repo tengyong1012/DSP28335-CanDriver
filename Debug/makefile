@@ -37,8 +37,8 @@ $(GEN_CMDS__FLAG) \
 "./canfestival/src/states.obj" \
 "./canfestival/src/sync.obj" \
 "./canfestival/src/timer.obj" \
+"../28335_RAM_lnk.cmd" \
 "../DSP2833x_Headers_nonBIOS.cmd" \
-"../F28335.cmd" \
 -l"libc.a" \
 
 -include ../makefile.init

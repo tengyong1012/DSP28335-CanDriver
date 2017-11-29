@@ -48,11 +48,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "def.h"
 //#define WD_SLEEP
 // Needed defines by Atmel lib
-#define FOSC           8000        // 8 MHz External cristal
+/*#define FOSC           8000        // 8 MHz External cristal
 #ifndef F_CPU
 #define F_CPU          (1000UL*FOSC) // Need for AVR GCC
 #endif
-#define CAN_BAUDRATE    125
+#define CAN_BAUDRATE    125*/
 
 // Needed defines by Canfestival lib
 #define MAX_CAN_BUS_ID 1
@@ -66,7 +66,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // CANOPEN_BIG_ENDIAN is not defined
 #define CANOPEN_LITTLE_ENDIAN 1
 
-#define US_TO_TIMEVAL_FACTOR 8
+#define US_TO_TIMEVAL_FACTOR 150
 
 #define REPEAT_SDO_MAX_SIMULTANEOUS_TRANSFERS_TIMES(repeat)\
 repeat

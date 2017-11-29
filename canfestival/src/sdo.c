@@ -302,7 +302,7 @@ UNS32 objdictToSDOline (CO_Data* d, UNS8 line)
  ** @return
  **/
 UNS8 lineToSDO (CO_Data* d, UNS8 line, UNS32 nbBytes, UNS8* data) {
-	UNS8 i;
+	UNS8 i, j;
 	UNS32 offset;
 
 #ifndef SDO_DYNAMIC_BUFFER_ALLOCATION
@@ -335,7 +335,14 @@ UNS8 lineToSDO (CO_Data* d, UNS8 line, UNS32 nbBytes, UNS8* data) {
 	}
 #else //SDO_DYNAMIC_BUFFER_ALLOCATION
 	for (i = 0 ; i < nbBytes ; i++)
-		* (data + i) = d->transfers[line].data[offset + i];
+		/////////////////////////////////////////////////////
+		//* (data + i) = d->transfers[line].data[offset + i];
+	    //////////////////////////////////////////////////////2017.11.29 tengy add
+		for (j = 0; j < 2; j++)
+		{
+			*(data + j + i * 2) = (d->transfers[line].data[offset + i] >> (j * 8)) & 0xFF;
+		}
+		//////////////////////////////////////////////////////
 #endif //SDO_DYNAMIC_BUFFER_ALLOCATION
 	d->transfers[line].offset = d->transfers[line].offset + nbBytes;
 	return 0;
@@ -1158,7 +1165,7 @@ UNS8 proceedSDO (CO_Data* d, Message *m)
 						failedSDO(d, CliServNbr, whoami, index, subIndex, SDOABT_GENERAL_ERROR);
 						return 0xFF;
 					}
-					for (i = 4 + nbBytes ; i < 8 ; i++)
+					for (i = 4 + nbBytes * 2; i < 8 ; i++)
 						data[i] = 0;
 					MSG_WAR(0x3A96, "SDO. Sending expedited upload initiate response defined at index 0x1200 + ",
 							CliServNbr);

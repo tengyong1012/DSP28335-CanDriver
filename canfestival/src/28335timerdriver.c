@@ -12,9 +12,9 @@
 #include "DSP2833x_Examples.h"   // DSP2833x Examples Include File
 
 // Define the timer registers
-#define TimerAlarm (CpuTimer0.InterruptCount)
-#define TimerCounter (CpuTimer0.InterruptCount)
-#define MAXCOUNTER (0x70000000)
+#define TimerAlarm (CpuTimer0Regs.PRD.all)
+#define TimerCounter (CpuTimer0Regs.TIM.all)
+#define MAXCOUNTER (0xFFFFFFFF)
 /************************** Modul variables **********************************/
 // Store the last timer value to calculate the elapsed time
 static TIMEVAL last_time_set = TIMEVAL_MAX;
@@ -40,7 +40,10 @@ OUTPUT	void
 void setTimer(TIMEVAL value)
 
 {
-  TimerAlarm += (int)value;	// Add the desired time to timer interrupt time
+  //TimerAlarm += (int)value;	// Add the desired time to timer interrupt time
+  ///////////////////////////////////////////////////////////////////////////////
+  TimerAlarm = value;
+  //////////////////////////////////////////////////////////////////////////////
 }
 
 /******************************************************************************
@@ -50,20 +53,23 @@ OUTPUT	value TIMEVAL (unsigned long) the elapsed time
 ******************************************************************************/
 TIMEVAL getElapsedTime(void)
 {
-  unsigned int timer = TimerCounter;            // Copy the value of the running timer
+  /*unsigned int timer = TimerCounter;            // Copy the value of the running timer
   if (timer > last_time_set)                    // In case the timer value is higher than the last time.
     return (timer - last_time_set);             // Calculate the time difference
   else if (timer < last_time_set)
     return (last_time_set - timer);             // Calculate the time difference
   else
-    return TIMEVAL_MAX;
+    return TIMEVAL_MAX;*/
+
+  unsigned int timer = TimerCounter;            // Copy the value of the running timer
+  return (timer - (unsigned int)last_time_set); // Calculate the time difference
 }
 
 interrupt void cpu_timer0_isr(void)
 {
    CpuTimer0.InterruptCount++;
    last_time_set = TimerCounter;
-   if (CpuTimer0.InterruptCount > MAXCOUNTER)
+   if (CpuTimer0.InterruptCount >= MAXCOUNTER)
    {
 	   CpuTimer0.InterruptCount = 0;
    }
